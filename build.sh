@@ -13,6 +13,10 @@ OUTPUT_EXE="program.exe"
 # Ensure necessary directories exist
 mkdir -p "$BIN_DIR" "$OBJ_DIR" "$ERR_DIR"
 
+# Clean previous build files
+echo "Cleaning previous build files..."
+rm -rf "$BIN_DIR"/* "$OBJ_DIR"/* "$ERR_DIR"/*
+
 # Set up OpenWatcom environment
 source "$WATCOM_PATH/owsetenv.sh"
 
@@ -21,6 +25,7 @@ echo "Using Watcom from: $WATCOM_PATH"
 echo "Source directory: $SRC_DIR"
 echo "Object directory: $OBJ_DIR"
 echo "Binary output: $BIN_DIR/$OUTPUT_EXE"
+echo "Error directory: $ERR_DIR"
 
 # Find source files (both .c and .cpp)
 SRC_FILES=$(ls "$SRC_DIR"/*.c "$SRC_DIR"/*.cpp 2>/dev/null)
@@ -36,13 +41,17 @@ echo "$SRC_FILES"
 export INCLUDE="$WATCOM_PATH/h"
 export WATCOM_TARGET="DOS"
 
-# Compile source files with explicit DOS target
+# Compile source files with explicit DOS target, ensuring .err files go into err/
 wcl -bcl=dos -zq -I"$WATCOM_PATH/h" -fe="$BIN_DIR/$OUTPUT_EXE" -fo="$OBJ_DIR/" $SRC_FILES 2> "$ERR_DIR/build_errors.log"
+
+# Move any generated .err files to the err directory
+find . -name "*.err" -exec mv {} "$ERR_DIR" \; 2>/dev/null
 
 # Check if compilation succeeded
 if [ $? -eq 0 ]; then
     if [ -f "$BIN_DIR/$OUTPUT_EXE" ]; then
         echo "Compilation successful. Executable is located at $BIN_DIR/$OUTPUT_EXE"
+        # Remove error log if empty
         [ ! -s "$ERR_DIR/build_errors.log" ] && rm "$ERR_DIR/build_errors.log"
     else
         echo "Compilation reported success, but no executable was found!"
