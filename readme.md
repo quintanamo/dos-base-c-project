@@ -7,6 +7,10 @@ A simple base project for writing C and C++ programs for DOS using the OpenWatco
     - Bash script targets "usr/bin/watcom/ by default (C and C++)
 - PowerShell Scripts enabled (for building on Windows)
 
+## Scripts
+- build.sh:  Builds all C/C++ files inside the src/ directory
+- run.sh:  Runs DosBox and mounts the bin/ directory as the C: drive
+
 ### Notes
 On Linux-based operating systems, you may notice Visual Studio Code giving an error for included libraries.  To fix this, add a file called "c_cpp_properties.json" inside the .vscode folder in root (create it if it doesn't exist already) and paste the following JSON into it:
 ```json
